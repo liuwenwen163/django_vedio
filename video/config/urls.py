@@ -1,4 +1,5 @@
-"""video URL Configuration
+# coding:utf-8
+"""config URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.1/topics/http/urls/
@@ -14,8 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from app.dashboard import urls as dashboard_urls
+from app.client import urls as client_urls
 
+# 不使用内置的admin，可以删掉admin的那条路由
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('dashboard/', include(dashboard_urls)),
+    path('client/', include(client_urls)),
 ]

@@ -4,11 +4,21 @@
     <meta charset="UTF-8">
     <title>${self.title()}</title>
     <link href="/static/dashboard/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/static/dashboard/css/base.css" rel="stylesheet" />
     ${self.css()}
 </head>
 <body>
-${self.content()}
 <%include file="nav.html"/>
+<div id="base-area">
+    <ul class="side-menu">
+        <li>管理员</li>
+        <li>用户</li>
+        <li>视频</li>
+    </ul>
+<div class="base-content">
+    ${self.contet()}
+</div>
+</div>
 </body>
 <script src="/static/dashboard/js/jquery-1.12.4.min.js"></script>
 <script src="/static/dashboard/js/bootstrap.min.js"></script>

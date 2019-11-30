@@ -1,9 +1,9 @@
 # encoding: utf-8
 
 from django.urls import path
-from .views.base import Base
+from .views.base import Index
 
 urlpatterns = [
-    path('base', Base.as_view())
+    path('', Index.as_view())
 ]
 

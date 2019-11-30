@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>${self.title()}</title>
-    <link href="/static/dashboard/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="/static/dashboard/css/bootstrap.min.css" rel="stylesheet" />
     ${self.css()}
 </head>
 <body>
 ${self.content()}
-
+<%include file="nav.html"/>
 </body>
 <script src="/static/dashboard/js/jquery-1.12.4.min.js"></script>
 <script src="/static/dashboard/js/bootstrap.min.js"></script>

@@ -2,8 +2,10 @@
 
 from django.urls import path
 from .views.base import Index
+from .views.auth import Login
 
 urlpatterns = [
-    path('', Index.as_view())
+    path('', Index.as_view(), name='dashboard_index'),
+    path('login', Login.as_view(), name='dashboard_login'),
 ]
 

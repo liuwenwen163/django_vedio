@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import View
 from app.libs.base_render import render_to_response
+from app.utils.permission import dashboard_auth
 
 
 class Login(View):
@@ -17,14 +18,19 @@ class Login(View):
             return redirect(reverse('dashboard_index'))
 
         data = {'error': ''}
+
+        # 去获取重定向过来的跳转目标to参数
+        to = request.GET.get('to', '')
+        data['to'] = to
+
         return render_to_response(request, self.TEMPLATE, data)
 
     def post(self, request):
         username = request.POST.get('username')
         password = request.POST.get('password')
+        # print(username, password)
 
         data = {}
-        # print(username, password)
 
         exists = User.objects.filter(username=username).exists()
         if not exists:
@@ -41,6 +47,12 @@ class Login(View):
             return render_to_response(request, self.TEMPLATE, data=data)
 
         login(request, user)
+
+        # 如果有跳转参数,就按照跳转参数跳转
+        to = request.GET.get('to', '')
+        if to:
+            return redirect(to)
+
         return redirect(reverse('dashboard_index'))
 
 
@@ -55,6 +67,7 @@ class AdminManager(View):
     """管理员管理用户的视图函数逻辑"""
     TEMPLATE = 'dashboard/auth/admin.html'
 
+    @dashboard_auth
     def get(self, request):
         users = User.objects.filter()
 

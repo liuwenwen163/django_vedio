@@ -1,6 +1,5 @@
 # encoding: utf-8
-from django.middleware.csrf import _get_new_csrf_string, _salt_cipher_secret, \
-    _unsalt_cipher_token, get_token
+from django.middleware.csrf import get_token
 from mako.lookup import TemplateLookup
 from django.template import RequestContext
 from django.conf import settings

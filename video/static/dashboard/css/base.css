@@ -42,3 +42,11 @@ html, body {
     right: 0;
     border-left: 1px solid #8c8c8c;
 }
+
+h1 {
+            margin: 5%;
+        }
+.admin_paginator {
+    margin-left: 48px;
+    font-size: 1.1em;
+}

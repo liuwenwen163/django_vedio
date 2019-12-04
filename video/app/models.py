@@ -1,3 +1,3 @@
 from django.db import models
-
-# Create your models here.
+from app.model.auth import ClientUser
+from app.model.video import Video, VideoType, VideoStar, VideoSub

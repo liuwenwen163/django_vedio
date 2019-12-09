@@ -91,18 +91,31 @@ class VideoSubView(View):
         return render_to_response(request, self.TEMPLATE, data=data)
 
     def post(self, request, video_id):
-        video = Video.objects.get(pk=video_id)
-
+        number = request.POST.get('number')
         url = request.POST.get('url')
+        videosub_id = request.POST.get('videosub_id')
 
-        # 获取集数
-        length = video.video_sub.count()
+        path_format = reverse('video_sub', kwargs={'video_id': video_id})
 
-        try:
-            VideoSub.objects.create(video=video, url=url, number=length + 1)
-        except:
-            path_format = '{}'.format(reverse('video_sub', kwargs={'video_id': video_id}))
-            return redirect('{}?error={}'.format(path_format, '不可重复创建'))
+        if not all([url, number]):
+            return redirect(reverse('{}?error={}'.format(path_format, '缺少必要字段')))
+
+        video = Video.objects.get(pk=video_id)
+        if not videosub_id:
+            # videosub_id存在就是进行创建
+            try:
+                VideoSub.objects.create(video=video, url=url, number=number)
+            except:
+                return redirect('{}?error={}'.format(path_format, '创建失败'))
+        else:
+            # 执行这个分支就说明是更新视频信息
+            try:
+                video_sub = VideoSub.objects.get(pk=videosub_id)
+                video_sub.url = url
+                video_sub.number = number
+                video_sub.save()
+            except:
+                return redirect('{}?error={}'.format(path_format, '重复创建'))
 
         return redirect(reverse('video_sub', kwargs={'video_id': video_id}))
 
@@ -151,4 +164,17 @@ class StarDelete(View):
                 'video_id': video_id,
             })
         )
+
+
+class SubDelete(View):
+
+    def get(self, request, videosub_id, video_id):
+        VideoSub.objects.filter(id=videosub_id).delete()
+
+        return redirect(
+            reverse('video_sub', kwargs={
+                'video_id': video_id,
+            })
+        )
+
 

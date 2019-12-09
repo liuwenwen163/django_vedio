@@ -3,7 +3,8 @@
 from django.urls import path
 from .views.base import Index
 from .views.auth import Login, AdminManager, Logout, UpdateAdminStatus
-from .views.video import ExternalVideo, VideoSubView, VideoStarView, StarDelete
+from .views.video import (ExternalVideo, VideoSubView,
+                          VideoStarView, StarDelete, SubDelete)
 
 """
 这里的路由都是注册到主路由上的，所以开头都是：localhost:8001/dashboard/
@@ -19,6 +20,8 @@ urlpatterns = [
     path('video/videosub/<int:video_id>', VideoSubView.as_view(), name='video_sub'),
     path('video/star', VideoStarView.as_view(), name='video_star'),
     path('/video/star/delete/<int:star_id>/<int:video_id>',
-         StarDelete.as_view(), name='star_delete')
+         StarDelete.as_view(), name='star_delete'),
+    path('video/sub/delete/<int:videosub_id>/<int:video_id>',
+         SubDelete.as_view(), name='sub_delete')
 ]
 

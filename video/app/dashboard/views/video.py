@@ -9,6 +9,11 @@ from app.utils.permission import dashboard_auth
 from app.model.enums import VideoType, FromType, NationalityType, IdentityType
 from app.utils.common import check_and_get_video_type
 
+"""
+post方法的页面不需要验证登录@dashboard_auth，post会传csrf_token。
+没有登陆的，即使有正确的接口，也是无法传递正确的csrf_token的。
+"""
+
 
 class ExternalVideo(View):
     TEMPLATE = 'dashboard/video/external_video.html'
@@ -31,10 +36,17 @@ class ExternalVideo(View):
         from_to = request.POST.get('from_to')
         nationality = request.POST.get('nationality')
         info = request.POST.get('info')
+        video_id = request.POST.get('video_id')
+
+        if video_id:
+            reverse_path = reverse(
+                'video_update', kwargs={'video_id': video_id})
+        else:
+            reverse_path = reverse('external_video')
 
         if not all([name, image, video_type, from_to, nationality, info]):
             return redirect(
-                '{}?error={}'.format(reverse('external_video'), '缺少必要字段')
+                '{}?error={}'.format(reverse_path, '缺少必要字段')
             )
 
         # 调用自定义的check函数验证 video_type 是否符合枚举类型
@@ -44,7 +56,7 @@ class ExternalVideo(View):
         )
         if result.get('code') != 0:
             return redirect(
-                '{}?error={}'.format(reverse('external_video'), result['msg'])
+                '{}?error={}'.format(reverse_path, result['msg'])
             )
 
         # 验证 from_to 是否符合定义的枚举类型
@@ -53,7 +65,7 @@ class ExternalVideo(View):
         )
         if result.get('code') != 0:
             return redirect(
-                '{}?error={}'.format(reverse('external_video'), result['msg'])
+                '{}?error={}'.format(reverse_path, result['msg'])
             )
 
         # 验证 nationality 是否符合定义的枚举类型
@@ -62,17 +74,35 @@ class ExternalVideo(View):
         )
         if result.get('code') != 0:
             return redirect(
-                '{}?error={}'.format(reverse('external_video'), result['msg'])
+                '{}?error={}'.format(reverse_path, result['msg'])
             )
 
-        Video.objects.create(
-            name=name,
-            image=image,
-            video_type=video_type,
-            from_to=from_to,
-            nationality=nationality,
-            info=info
-        )
+        # 如果没有获取到video_id就是创建视频
+        if not video_id:
+            try:
+                Video.objects.create(
+                    name=name,
+                    image=image,
+                    video_type=video_type,
+                    from_to=from_to,
+                    nationality=nationality,
+                    info=info
+                )
+            except:
+                return redirect('{}?error={}'.format(reverse_path, '创建失败'))
+        else:
+            try:
+                # 这个分支编辑更新视频信息
+                video = Video.objects.get(pk=video_id)
+                video.name = name
+                video.image = image
+                video.video_type = video_type
+                video.from_to = from_to
+                video.nationality = nationality
+                video.info = info
+                video.save()
+            except:
+                return redirect('{}?error={}'.format(reverse_path, '修改失败'))
 
         return redirect(reverse('external_video'))
 
@@ -177,4 +207,27 @@ class SubDelete(View):
             })
         )
 
+
+class VideoUpdate(View):
+    TEMPLATE = 'dashboard/video/video_update.html'
+
+    @dashboard_auth
+    def get(self, request, video_id):
+        data = {}
+        video = Video.objects.get(pk=video_id)
+
+        data['video'] = video
+
+        return render_to_response(request, self.TEMPLATE, data=data)
+
+
+class VideoUpdateStatus(View):
+
+    def get(self, request, video_id):
+
+        video = Video.objects.get(pk=video_id)
+        video.status = not video.status
+        video.save()
+
+        return redirect(reverse('external_video'))
 

@@ -7,7 +7,7 @@ from app.libs.base_render import render_to_response
 from app.model.video import Video, VideoSub, VideoStar
 from app.utils.permission import dashboard_auth
 from app.model.enums import VideoType, FromType, NationalityType, IdentityType
-from app.utils.common import check_and_get_video_type
+from app.utils.common import check_and_get_video_type, handle_video
 
 """
 post方法的页面不需要验证登录@dashboard_auth，post会传csrf_token。
@@ -24,8 +24,11 @@ class ExternalVideo(View):
         error = request.GET.get('error', '')
         data = {'error': error}
 
-        videos = Video.objects.exclude(from_to=FromType.custom.value)
-        data['videos'] = videos
+        cus_videos = Video.objects.filter(from_to=FromType.custom.value)
+        ex_videos = Video.objects.exclude(from_to=FromType.custom.value)
+
+        data['ex_videos'] = ex_videos
+        data['cus_videos'] = cus_videos
 
         return render_to_response(request, self.TEMPLATE, data=data)
 
@@ -122,17 +125,28 @@ class VideoSubView(View):
 
     def post(self, request, video_id):
         number = request.POST.get('number')
-        url = request.POST.get('url')
         videosub_id = request.POST.get('videosub_id')
+        video = Video.objects.get(pk=video_id)
+
+        # 判断是自制视频,便进行获取文件
+        if FromType(video.from_to) == FromType.custom:
+            url = request.FILES.get('url')
+        else:
+            # 获取form表单中上传的文件
+            url = request.POST.get('url')
 
         path_format = reverse('video_sub', kwargs={'video_id': video_id})
 
         if not all([url, number]):
-            return redirect(reverse('{}?error={}'.format(path_format, '缺少必要字段')))
+            return redirect('{}?error={}'.format(path_format, '缺少必要字段'))
 
-        video = Video.objects.get(pk=video_id)
+        if FromType(video.from_to) == FromType.custom:
+            # 自制视频的上传
+            handle_video(url, video_id, number)
+            return redirect(reverse('video_sub', kwargs={'video_id': video_id}))
+
         if not videosub_id:
-            # videosub_id存在就是进行创建
+            # videosub_id存在就是进行创建,并且还不是自制视频
             try:
                 VideoSub.objects.create(video=video, url=url, number=number)
             except:

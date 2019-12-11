@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from config.security import secret_id, secret_key, txy_url
+
+# BASE_DIR是当前项目的绝对路径，当前项目中就是：F:\410_coding\django\django_video\video
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -124,3 +127,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+
+# 腾讯云的SDK接口信息
+TXY_ID = secret_id
+TXY_KEY = secret_key
+TXY_URL = txy_url
+REGION = 'ap-guangzhou'    # 替换为用户的region
+TOKEN = None
+BUCKET = 'yuanchen-1259143427'

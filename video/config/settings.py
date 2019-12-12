@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+import djcelery
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from config.security import secret_id, secret_key, txy_url
 
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'djcelery',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +138,9 @@ TXY_URL = txy_url
 REGION = 'ap-guangzhou'    # 替换为用户的region
 TOKEN = None
 BUCKET = 'yuanchen-1259143427'
+
+# celery异步队列
+djcelery.setup_loader()
+BROKER_URL = 'redis://localhost:6379/2'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/3'
+CELERY_IMPORTS = ('app.tasks.task')

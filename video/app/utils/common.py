@@ -5,8 +5,8 @@ import time
 import shutil
 
 from django.conf import settings
-from app.libs.base_txy import video_txy
-from app.model.video import VideoSub, Video
+from app.models import Video, VideoSub
+from app.tasks.task import video_task
 
 
 def check_and_get_video_type(type_obj, type_value, message):
@@ -46,31 +46,18 @@ def handle_video(video_file, video_id, number):
 
     # 使用ffmpeg将转码后的文件存入out_path
     command = 'ffmpeg -i {} -c copy {}.mp4'.format(path_name, out_path)
-    os.system(command)  # 文件转码成功到out_path
 
-    out_name = '.'.join([out_path, 'mp4'])  # 上传到云中的最终名称
-    if not os.path.exists(out_name):
-        remove_path([out_name, path_name])
-        return False
+    video = Video.objects.get(pk=video_id)
+    video_sub = VideoSub.objects.create(
+        video=video,
+        url='',
+        number=number
+    )
 
-    url = video_txy.put(video_file.name, out_name)
-    if url:
-        # 如果获得了文件远程url就将其存入VideoSub数据库
-        video = Video.objects.get(pk=video_id)
-        try:
-            VideoSub.objects.create(
-                video=video,
-                url=url,
-                number=number,
-            )
-            return True
-        except:
-            return False
-        finally:
-            # 无论是否存入成功都要清楚两个目录里面的资源
-            remove_path([out_name, path_name])
-    else:
-        remove_path([out_name, path_name])
-        return False
+    video_task.delay(
+        command, out_path, path_name,
+        video_file.name, video_sub.id
+    )
+    return False
 
 

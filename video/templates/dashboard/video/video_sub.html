@@ -58,11 +58,7 @@
         % for video_sub in video.video_sub.all():
             <tr>
                 <td>第${video_sub.number}集</td>
-                % if FromType(video.from_to) == FromType.custom:
-                    <td><p class="info">${video_sub.url or '处理中...'}</p></td>
-                % else:
-                    <td><p class="info">${video_sub.url}</p></td>
-                % endif
+                <td><p class="info">${video_sub.url}</p></td>
                 <td>
                     <a class="btn btn-default" href="${video_sub.url}">查看</a>&nbsp;
 ##                  <!-- 将data的数据作为属性存入标签中，提供给上面的form表单获取 -->

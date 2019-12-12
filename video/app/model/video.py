@@ -1,7 +1,7 @@
 # encoding: utf-8
 """用户视频的数据模型"""
 from django.db import models
-from .enums import VideoType, FromType, NationalityType
+from .enums import VideoType, FromType, NationalityType, IdentityType
 
 
 class Video(models.Model):
@@ -38,6 +38,15 @@ class VideoStar(models.Model):
     class Meta:
         """保证几个关键属性的唯一性"""
         unique_together = ('video', 'name', 'identity')
+
+    @property
+    def identity_type(self):
+        # 获取videostar的身份属性，可以获取到就返回枚举类型的label，否则返回空
+        try:
+            result = IdentityType(self.identity)
+        except:
+            return ''
+        return result.label
 
     def __str__(self):
         return 'video_star:{}, video_name:{}'.format(self.video.name, self.video)

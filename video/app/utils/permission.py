@@ -5,6 +5,9 @@ import functools
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from app.model.auth import ClientUser
+from .consts import COOKIE_NAME
+
 
 def dashboard_auth(func):
     """定义一个装饰器，验证用户登录情况"""
@@ -26,4 +29,19 @@ def dashboard_auth(func):
         return func(self, request, *args, **kwargs)
 
     return wrapper
+
+
+def client_auth(request):
+    """自定义客户端的认证处理函数"""
+    value = request .COOKIES.get(COOKIE_NAME)
+
+    if not value:
+        return None
+
+    user = ClientUser.objects.filter(pk=value)
+
+    if user:
+        return user[0]
+    else:
+        return None
 

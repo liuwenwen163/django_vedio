@@ -24,3 +24,34 @@ p{
     display: inline-block;
 }
 
+.comment-area {
+    width: 100%;
+    margin-bottom: 4rem;
+}
+
+.comment-area a {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    text-align: center;
+}
+
+.comment-area textarea {
+    width: 90%;
+    height: 5rem;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin: 0 auto;
+    display: block;
+}
+
+#comment-submit {
+    border: 1px solid #cccc;
+    padding: 0.2rem;
+    margin-left: 5%;
+    display: block;
+}
+
+.comment-show-area{
+    margin-bottom: 3rem;
+}

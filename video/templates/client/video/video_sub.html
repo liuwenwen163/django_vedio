@@ -33,9 +33,35 @@
                 </ul>
             % endif
         </p>
+        <div class="comment-show-area">
+            <span class="span">评论区域</span><br>
+            <div id="ajax-comment-show"></div>
+            <div class="comment-area">
+                % if user:
+                    <textarea id="comment-content"></textarea><br>${csrf_token}
+                    <button id="comment-submit" data-url="${reverse('client_add_comment')}" data-user-id="${user.id}" data-video-id="${video.id}">提交</button>
+                % else:
+                    <a href="${reverse('client_user')}">请您登录，登录后可评论</a>
+                % endif
+            <p>
+                <span class="span">评论展示</span>
+                <ul class="comment-show">
+                    % for comment in comments:
+                        <li>
+                            <span>${comment.content}</span>&nbsp;
+                            <span>${comment.user.username}</span>
+                        </li>
+                    % endfor
+                </ul>
+            </p>
+            </div>
+        </div>
     </div>
 </%def>
 <%def name="css()">
     <link rel="stylesheet" href="/static/client/css/video_sub.css">
+</%def>
+<%def name="js()">
+    <script src="/static/client/js/video_sub.js"></script>
 </%def>
 

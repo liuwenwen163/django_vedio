@@ -2,6 +2,7 @@
 from django.urls import path
 
 from app.client.views.auth import User, Regist, Logout
+from app.client.views.comment import CommentView
 from .views.base import Index
 from .views.video import ExVideo, VideoSub, CusVideo
 
@@ -13,5 +14,6 @@ urlpatterns = [
     path('auth', User.as_view(), name='client_user'),
     path('auth/regist', Regist.as_view(), name='client_regist'),
     path('auth/logout', Logout.as_view(), name='client_logout'),
+    path('comment/add', CommentView.as_view(), name='client_add_comment'),
 ]
 
